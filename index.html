@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amiibo Lineup Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&amp;display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>Amiibo Lineup Builder</h1>
+    <p>Set up each fighter’s stats, spirits and CPU behaviour, then export the whole lineup as amiibo <code>.bin</code> files.</p>
+  </header>
+
+  <div class="toolbar" role="toolbar" aria-label="Lineup actions">
+    <button type="button" id="addFighter" class="primary">Add Fighter</button>
+    <button type="button" id="pasteText">Paste Text</button>
+    <button type="button" id="exportBin">Export BIN</button>
+  </div>
+
+  <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+  <label id="keyPick" class="keypick" hidden>
+    <span>key_retail.bin was not found in the repo. Choose it from your computer, then press Export BIN again:</span>
+    <input type="file" id="keyFile" accept=".bin">
+  </label>
+
+  <main id="lineup" aria-label="Fighter lineup"></main>
+  <p id="empty" class="empty">No fighters yet. Press <strong>Add Fighter</strong> or <strong>Paste Text</strong> to start a lineup.</p>
+
+  <dialog id="pasteDialog" aria-labelledby="pasteTitle">
+    <form method="dialog" class="dlg" id="pasteForm">
+      <h2 id="pasteTitle">Lineup as text</h2>
+      <textarea id="pasteArea" spellcheck="false" aria-label="Lineup text"></textarea>
+      <p id="pasteWarn" class="warn" role="alert" hidden></p>
+      <div class="dlg-actions">
+        <button type="button" id="pasteCancel">Cancel</button>
+        <button type="button" id="pasteApply" class="primary">Apply</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
