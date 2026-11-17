@@ -16,6 +16,7 @@ const CONFIG = {
   // fighterList.csv name -> name used in amiibo-editor/resources/characters.json
   characterNames: { 'R.O.B.': 'R.O.B. - NES', 'Steve/Alex': 'Steve' },
   zipName: 'amiibo-lineup.zip',
+  numberPrefix: false, // true -> 0_Cloud.bin, 1_Falco.bin ... (fallback if your unzip tool ignores timestamps)
 };
 const STARTERS = ['Squirtle', 'Ivysaur', 'Charizard'];
 const isMii = (f) => f in CONFIG.miiBins;
@@ -337,6 +338,7 @@ $('exportBin').addEventListener('click', async (ev) => {
 
     const totals = {}; states.forEach((s) => (totals[safeName(s.fighter)] = (totals[safeName(s.fighter)] || 0) + 1));
     const seen = {}, zip = new JSZip();
+    const t0 = Date.now(); // ZIP times have 2 s resolution, so space files 2 s apart, oldest = first fighter
     for (const [i, s] of states.entries()) {
       const who = `Fighter ${i + 1} (${s.fighter})`;
       showStatus(`Building ${who}…`, log);
@@ -356,7 +358,8 @@ $('exportBin').addEventListener('click', async (ev) => {
 
         const base = safeName(s.fighter);
         const name = totals[base] > 1 ? `${base}_${(seen[base] = (seen[base] || 0) + 1)}.bin` : `${base}.bin`;
-        zip.file(name, await amiibo.export());
+        const file = CONFIG.numberPrefix ? `${i}_${name}` : name;
+        zip.file(file, await amiibo.export(), { date: new Date(t0 - (states.length - 1 - i) * 2000) });
       } catch (err) {
         log.push({ cls: 'bad', text: `${who}: ${err.message}` });
       }
