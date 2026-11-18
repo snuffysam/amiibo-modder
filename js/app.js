@@ -16,6 +16,7 @@ const CONFIG = {
   // fighterList.csv name -> name used in amiibo-editor/resources/characters.json
   characterNames: { 'R.O.B.': 'R.O.B. - NES', 'Steve/Alex': 'Steve' },
   zipName: 'amiibo-lineup.zip',
+  shuffleSN: true, // give every exported amiibo a new random serial number (UID)
   numberPrefix: false, // true -> 0_Cloud.bin, 1_Falco.bin ... (fallback if your unzip tool ignores timestamps)
 };
 const STARTERS = ['Squirtle', 'Ivysaur', 'Charizard'];
@@ -359,7 +360,7 @@ $('exportBin').addEventListener('click', async (ev) => {
         const base = safeName(s.fighter);
         const name = totals[base] > 1 ? `${base}_${(seen[base] = (seen[base] || 0) + 1)}.bin` : `${base}.bin`;
         const file = CONFIG.numberPrefix ? `${i}_${name}` : name;
-        zip.file(file, await amiibo.export(), { date: new Date(t0 - (states.length - 1 - i) * 2000) });
+        zip.file(file, await amiibo.export({ shuffleSN: CONFIG.shuffleSN }), { date: new Date(t0 - (states.length - 1 - i) * 2000) });
       } catch (err) {
         log.push({ cls: 'bad', text: `${who}: ${err.message}` });
       }

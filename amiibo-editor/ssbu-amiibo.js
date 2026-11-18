@@ -203,9 +203,15 @@ export class SsbuAmiibo {
     [...s].forEach((ch, i) => { const c = ch.charCodeAt(0); d[0x20 + 2 * i] = c >> 8; d[0x21 + 2 * i] = c & 255; });
   }
 
-  /** Re-encrypts and returns the final 540-byte .bin */
-  async export() {
+  /** Re-encrypts and returns the final 540-byte .bin. shuffleSN (default on) gives it a new random UID/serial number. */
+  async export({ shuffleSN = true } = {}) {
     const d = amiitoolsToDump(this.data);
+    if (shuffleSN) { // same as randomize_sn(): UID = 04 + 6 random bytes (0x88 avoided), check bytes recomputed
+      const uid = Uint8Array.of(0x04, ...crypto.getRandomValues(new Uint8Array(6)).map((v) => (v === 0x88 ? 0x89 : v)));
+      d.set(uid.slice(0, 3), 0); d.set(uid.slice(3), 4);
+      d[3] = 0x88 ^ uid[0] ^ uid[1] ^ uid[2];
+      d[8] = uid[3] ^ uid[4] ^ uid[5] ^ uid[6];
+    }
     const mark = (n) => (n.endsWith('□') ? n : n.length >= 10 ? n.slice(0, 9) + '□' : n + '□');
     const now = SsbuAmiibo.#nick(d), before = SsbuAmiibo.#nick(this.baseline);
     if (!same(d.slice(444, 502), this.baseline.slice(444, 502))) {
